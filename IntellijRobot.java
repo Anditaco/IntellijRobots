@@ -6,16 +6,20 @@ import robocode.ScannedRobotEvent;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.SortedMap;
 
 public class IntellijRobot extends AdvancedRobot {
 
-    public EnemyList enemies = new EnemyList(this);
+    private EnemyList enemies = new EnemyList(this);
+
 
     public void run() {
 
-        Color radar = new Color(255, 198, 69);
-        Color gun = new Color(255, 169, 43);
-        Color body = new Color(136, 136, 136);
+        Color radar = new Color(255, 205, 56);
+        Color body = new Color(255, 169, 43);
+        Color gun = new Color(136, 136, 136);
 
         setColors(body, gun, radar);
 
@@ -62,7 +66,7 @@ public class IntellijRobot extends AdvancedRobot {
 
 
 
-        public Enemy(ScannedRobotEvent e, AdvancedRobot player){
+        Enemy(ScannedRobotEvent e, AdvancedRobot player){
             this.player = player;
             name = e.getName();
             updateData(e);
@@ -81,34 +85,32 @@ public class IntellijRobot extends AdvancedRobot {
             y = player.getY() + Math.cos(angle) * distance;
         }
 
-        public String getName(){return name;}
+        String getName(){return name;}
 
-        public double getX(){return x;}
-        public double getY(){return y;}
-        public double getDistance(){return distance;}
-        public double getBearing(){return bearing;}
+        double getX(){return x;}
+        double getY(){return y;}
     }
 
     class EnemyList{
         AdvancedRobot player;
 
-        public EnemyList(AdvancedRobot player){
+        EnemyList(AdvancedRobot player){
             this.player = player;
         }
 
         ArrayList<Enemy> enemyList = new ArrayList<>();
 
-        public ArrayList<Enemy> getEnemyList(){return enemyList;}
+        ArrayList<Enemy> getEnemyList(){return enemyList;}
 
-        public void add(ScannedRobotEvent e){
+        void add(ScannedRobotEvent e){
             enemyList.add(new Enemy(e, player));
         }
 
-        public void remove(RobotDeathEvent d){
+        void remove(RobotDeathEvent d){
             enemyList.remove(getRobotByName(d.getName()));
         }
 
-        public Enemy get(ScannedRobotEvent s){
+        Enemy get(ScannedRobotEvent s){
             return getRobotByName(s.getName());
         }
 
@@ -119,10 +121,62 @@ public class IntellijRobot extends AdvancedRobot {
             return null;
         }
 
-        public boolean containsRobot(String id){
+        boolean containsRobot(String id){
             for(Enemy e : enemyList) if(e.getName().equals(id)) return true;
             return false;
         }
     }
 
+    class ProbabilityMap{
+        ArrayList<Action> possibleActions = new ArrayList<>();
+        public ProbabilityMap(){
+            possibleActions.add(new AccelerateForwards());
+            possibleActions.add(new AccelerateBackwards());
+            possibleActions.add(new TurnRight());
+            possibleActions.add(new TurnLeft());
+        }
+
+        public void updateProbabilities(ScannedRobotEvent newData, Enemy oldData){
+            //TODO
+            //Calculate disparity between data and apply it to the actions' sortedmap
+            //with duration being time since last change of action
+        }
+    }
+
+    abstract class Action{
+        //TODO
+        //Make probability check validity
+        //eg. can't accelerate if already at max speed, so probability should be 0
+
+        SortedMap<Integer, Double> durationToProbability;
+        public double getProbabilityAtDuration(int duration){
+            Integer[] keys = durationToProbability.keySet().toArray(new Integer[durationToProbability.size()]);
+            for(int i = 0; i < keys.length; i++){
+                if(keys[i] > duration){
+                    double dY = durationToProbability.get(keys[i]) - durationToProbability.get(keys[i-1]);
+                    double dX = keys[i] - keys[i-1];
+                    double estimatedProbability = dY/dX * (duration - keys[i-1]);
+                    return estimatedProbability;
+                }
+            }
+            return 0;
+        }
+    }
+
+    private class AccelerateForwards extends Action{
+        //TODO
+        //link probability map to generating and applying a move;
+    }
+    private class AccelerateBackwards extends Action{
+        //TODO
+        //link probability map to generating and applying a move;
+    }
+    private class TurnRight extends Action{
+        //TODO
+        //link probability map to generating and applying a move;
+    }
+    private class TurnLeft extends Action{
+        //TODO
+        //link probability map to generating and applying a move;
+    }
 }
