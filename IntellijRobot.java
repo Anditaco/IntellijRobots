@@ -12,6 +12,13 @@ public class IntellijRobot extends AdvancedRobot {
     public EnemyList enemies = new EnemyList(this);
 
     public void run() {
+
+        Color radar = new Color(255, 198, 69);
+        Color gun = new Color(255, 169, 43);
+        Color body = new Color(136, 136, 136);
+
+        setColors(body, gun, radar);
+
         setAdjustGunForRobotTurn(true);
         setAdjustRadarForGunTurn(true);
 
