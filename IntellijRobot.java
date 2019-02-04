@@ -55,6 +55,8 @@ public class IntellijRobot extends AdvancedRobot {
     class Enemy{
         AdvancedRobot player;
 
+        ProbabilityMap probabilities = new ProbabilityMap();
+
         String name;
         double x, y;
         double heading;
@@ -63,8 +65,6 @@ public class IntellijRobot extends AdvancedRobot {
         double distance;
         double bearing;
         double angle;
-
-
 
         Enemy(ScannedRobotEvent e, AdvancedRobot player){
             this.player = player;
@@ -144,12 +144,10 @@ public class IntellijRobot extends AdvancedRobot {
     }
 
     abstract class Action{
-        //TODO
-        //Make probability check validity
-        //eg. can't accelerate if already at max speed, so probability should be 0
 
         SortedMap<Integer, Double> durationToProbability;
         public double getProbabilityAtDuration(int duration){
+            if(!isPossible()) return 0;
             Integer[] keys = durationToProbability.keySet().toArray(new Integer[durationToProbability.size()]);
             for(int i = 0; i < keys.length; i++){
                 if(keys[i] > duration){
@@ -161,21 +159,39 @@ public class IntellijRobot extends AdvancedRobot {
             }
             return 0;
         }
+
+        abstract boolean isPossible();
     }
 
     private class AccelerateForwards extends Action{
+        @Override
+        boolean isPossible() {
+            return false;
+        }
         //TODO
         //link probability map to generating and applying a move;
     }
     private class AccelerateBackwards extends Action{
+        @Override
+        boolean isPossible() {
+            return false;
+        }
         //TODO
         //link probability map to generating and applying a move;
     }
     private class TurnRight extends Action{
+        @Override
+        boolean isPossible() {
+            return true;
+        }
         //TODO
         //link probability map to generating and applying a move;
     }
     private class TurnLeft extends Action{
+        @Override
+        boolean isPossible() {
+            return true;
+        }
         //TODO
         //link probability map to generating and applying a move;
     }
