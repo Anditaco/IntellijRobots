@@ -4,21 +4,20 @@ import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
 
 class Enemy {
-    AdvancedRobot player;
+    private AdvancedRobot player;
 
-    ProbabilityMap probabilities;
+    private ProbabilityMap probabilities;
 
-    String name;
-    double x, y;
-    double heading;
-    double speed;
-    double energy;
-    double distance;
-    double bearing;
-    double angle;
+    private String name;
+    private double x,y;
+    private double heading;
+    private double speed;
+    private double energy;
+    private double distance;
+    private double bearing;
+    private double angle;
 
-    long lastUpdateTime = 0;
-    long currentUpdateTime = 0;
+    private long lastUpdateTime = 0;
 
     Enemy(ScannedRobotEvent e, AdvancedRobot player){
         this.player = player;
@@ -28,9 +27,10 @@ class Enemy {
         updateData(e);
     }
 
-    public void updateData(ScannedRobotEvent e){
-        lastUpdateTime = currentUpdateTime;
-        currentUpdateTime = e.getTime();
+    void updateData(ScannedRobotEvent e){
+        updateProbabilities(e);
+
+        lastUpdateTime = e.getTime();
 
         energy = e.getEnergy();
         heading = e.getHeading();
@@ -42,8 +42,6 @@ class Enemy {
 
         x = player.getX() + Math.sin(angle) * distance;
         y = player.getY() + Math.cos(angle) * distance;
-
-        updateProbabilities(e);
     }
 
     long getTime(){
@@ -54,6 +52,8 @@ class Enemy {
 
     double getX(){return x;}
     double getY(){return y;}
+
+    double getSpeed(){return speed;}
 
     private void updateProbabilities(ScannedRobotEvent e){
         probabilities.updateProbabilities(e, this);

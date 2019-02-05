@@ -3,7 +3,7 @@ package IntellijRobots;
 import java.util.SortedMap;
 
 abstract class Action {
-    SortedMap<Integer, Double> durationToProbability;
+    private SortedMap<Integer, Double> durationToProbability;
     public double getProbabilityAtDuration(int duration){
         if(!isPossible()) return 0;
         Integer[] keys = durationToProbability.keySet().toArray(new Integer[durationToProbability.size()]);
