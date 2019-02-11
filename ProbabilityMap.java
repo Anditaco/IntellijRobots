@@ -10,58 +10,49 @@ class ProbabilityMap {
     private ArrayList<Action> possibleActions = new ArrayList<>();
     ProbabilityMap(IntellijRobot intellijRobot){
         this.intellijRobot = intellijRobot;
-        possibleActions.add(new AccelerateForwards());
-        possibleActions.add(new AccelerateBackwards());
-        possibleActions.add(new TurnRight());
-        possibleActions.add(new TurnLeft());
+        possibleActions.add(new Accelerate());
+        possibleActions.add(new Turn());
     }
 
-    void updateProbabilities(ScannedRobotEvent newData, Enemy oldData){
+    void updateProbabilities(ScannedRobotEvent newData, Enemy oldData) {
         long dT = newData.getTime() - oldData.getTime();
-        if(dT > 8) return;
+        if (dT > 8) return;
         intellijRobot.out.println(dT + " ticks happened since " + oldData.getName() + " was last updated");
 
-        //Calculate their estimated data if everything stayed the same
-        double turnRate = Rules.getTurnRateRadians(oldData.getSpeed());
-        double slowRate = Rules.DECELERATION;
-        double speedRate = Rules.ACCELERATION;
+        double averageTurnRate = (newData.getHeading() - oldData.getHeading())/dT;
+        double averageAcceleration = (newData.getVelocity() - oldData.getSpeed())/dT;
 
-
-        double sNTFSD = 0;
-        for(int i = 0; i < dT; i++){
-            if(oldData.getSpeed() - slowRate*i >= 0){
-                sNTFSD += oldData.getSpeed() - slowRate*i;
-            }
-            else{
-                sNTFSD -= i-oldData.getSpeed()/slowRate * speedRate;
-            }
+        int startingTick;
+        if(averageTurnRate == oldData.getLastKnownTurnRate() && averageAcceleration == 0){
+           startingTick = oldData.getTicksWithoutChange();
+           oldData.setLastKnownTurnRate(averageTurnRate);
+           oldData.setTicksWithoutChange(startingTick + (int)dT);
         }
-        double avgSpeedNTFSD = sNTFSD/dT;
-        double xNoTurnFullSlow = avgSpeedNTFSD * Math.cos(Math.PI/2 + oldData.getHeadingR()) + oldData.getX();
-        double yNoTurnFullSlow = oldData.getSpeed() * Math.sin(Math.PI/2 + oldData.getHeadingR()) + oldData.getY();
+        else{
+            startingTick = 0;
+        }
 
-        double xNoTurnNoSlow = oldData.getSpeed() * Math.cos(Math.PI/2 + oldData.getHeadingR()) + oldData.getX();
-        double yNoTurnNoSlow = oldData.getSpeed() * Math.sin(Math.PI/2 + oldData.getHeadingR()) + oldData.getY();
-
-        double xTurningRightNoSlow = (oldData.getSpeed()/turnRate) * Math.cos(Math.PI - oldData.getHeadingR() + turnRate*dT) + oldData.getX();
-        double yTurningRightNoSlow = (oldData.getSpeed()/turnRate) * Math.sin(Math.PI - oldData.getHeadingR() + turnRate*dT) + oldData.getY();
-
-        double xTurningLeftNoSlow = (oldData.getSpeed()/(turnRate*-1)) * Math.cos(Math.PI - oldData.getHeadingR() + turnRate*dT*-1) + oldData.getX();
-        double yTurningLeftNoSlow = (oldData.getSpeed()/(turnRate*-1)) * Math.sin(Math.PI - oldData.getHeadingR() + turnRate*dT*-1) + oldData.getY();
-
-
-        oldData.setProjections(xNoTurnFullSlow, yNoTurnFullSlow, xNoTurnNoSlow, yNoTurnNoSlow, xTurningRightNoSlow, yTurningRightNoSlow, xTurningLeftNoSlow, yTurningLeftNoSlow);
+        double averageTurnSpeed = Rules.getTurnRate((oldData.getSpeed() + newData.getVelocity())/2.0);
+        //probability for each tick to turn that gives an expected value of the yielded amount turned
+        double turnProbability = Math.pow(Math.abs((averageTurnRate*dT))/(Math.pow(averageTurnSpeed, dT)), 1.0/dT);
 
         //TODO
-        //MAKE THE PROJECTIONS DRAW oN THE SCREEN
+        //tallies number of ticks used to accelerate based on different braking and speeding up rates
+        double accelerationTickCount;
+        if((oldData.getSpeed() < 0 && newData.getVelocity() < 0)){
+            accelerationTickCount = Math.abs(averageAcceleration);
+        }
+        //TODO
+        //Factor in the different rates of acceleration based on direction to the probability of accelerating
+        double accelerateProbability = Math.pow(Math.abs((averageAcceleration*dT))/(Math.pow(averageAcceleration, dT)), 1.0/dT);
 
 
-        //check against current data
-
-
-        //if they have to have turned, update probability for all durations lower than dT
-
-        //if they have to have changed speed, update probability for all durations lower than dT
+        int tSign = averageTurnRate < 0 ? -1 : 1;
+        int aSign = averageAcceleration < 0 ? -1 : 1;
+        for(int i = startingTick; i < startingTick + dT; i++){
+            possibleActions.get(1).weigh(i, turnProbability*tSign);
+            possibleActions.get(0).weigh(i, accelerateProbability*aSign);
+        }
 
     }
 }
