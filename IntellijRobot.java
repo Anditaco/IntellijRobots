@@ -46,5 +46,48 @@ public class IntellijRobot extends AdvancedRobot {
             g.drawLine((int)e.getX(), (int)e.getY(), (int) getX(), (int) getY());
             g.fillRect((int)e.getX() - 20, (int)e.getY() - 20, 40, 40);
         }
+
+
+        //TODO
+        //Draw lines of probabilities for turn and accelerate
+        //where color represents probability and direction
+        //on the top of the screen for each robot
+
+        for(int i = 0; i < enemies.getEnemyList().size(); i++){
+            Enemy e = enemies.getEnemyList().get(i);
+
+            int scopeOfSpeedDuration = e.getProbabilities().getAccelerateAction().getScopeOfDuration();
+            out.println("scope of speed: " + scopeOfSpeedDuration);
+            int scopeOfTurnDuration = e.getProbabilities().getTurnAction().getScopeOfDuration();
+            out.println("scope of turn: " + scopeOfTurnDuration);
+            int sizeDeterminingScope = Integer.max(scopeOfSpeedDuration, scopeOfTurnDuration);
+            out.println("size determining scope: " + sizeDeterminingScope);
+
+
+            double barScaleFactor = .8;
+            double tileWidth = getBattleFieldWidth() * barScaleFactor / sizeDeterminingScope;
+            double startingX = getBattleFieldWidth() * (1-barScaleFactor)/2;
+            for(int col = 0; col < sizeDeterminingScope; col++){
+                double probabilityAtDuration = e.getProbabilities().getAccelerateAction().getProbabilityAtDuration(col);
+
+                out.println("Probability of change in speed at " + col + " is " + probabilityAtDuration);
+
+                g.setColor(new Color(128 + (int)(127*probabilityAtDuration), 0 ,128 - (int)(127*probabilityAtDuration)));
+                g.fillRect((int)(startingX + tileWidth*col), 20, (int)(tileWidth), 20);
+                g.setColor(Color.BLACK);
+                g.drawRect((int)(startingX + tileWidth*col), 20, (int)(tileWidth), 20);
+            }
+
+            for(int col = 0; col < sizeDeterminingScope; col++){
+                double probabilityAtDuration = e.getProbabilities().getTurnAction().getProbabilityAtDuration(col);
+
+                out.println("Probability of change in turn at " + col + " is " + probabilityAtDuration);
+
+                g.setColor(new Color(0, 128 + (int)(127*probabilityAtDuration) ,128 - (int)(127*probabilityAtDuration)));
+                g.fillRect((int)(startingX + tileWidth*col), 40, (int)(tileWidth), 20);
+                g.setColor(Color.BLACK);
+                g.drawRect((int)(startingX + tileWidth*col), 40, (int)(tileWidth), 20);
+            }
+        }
     }
 }

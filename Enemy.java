@@ -68,5 +68,5 @@ class Enemy {
     private void updateProbabilities(ScannedRobotEvent e){
         probabilities.updateProbabilities(e, this);
     }
-
+    public ProbabilityMap getProbabilities(){return probabilities;}
 }

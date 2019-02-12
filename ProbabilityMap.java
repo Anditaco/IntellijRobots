@@ -19,8 +19,27 @@ class ProbabilityMap {
         if (dT > 8) return;
         intellijRobot.out.println(dT + " ticks happened since " + oldData.getName() + " was last updated");
 
+
+        double accelerationTickCount = 0;
+        double speed = oldData.getSpeed();
+        if(oldData.getSpeed() < newData.getVelocity()){
+            while(speed < newData.getVelocity()){
+                accelerationTickCount++;
+                speed = speed < 0 ? speed + 2 : speed + 1;
+            }
+        }
+        else{
+            while(speed > newData.getVelocity()){
+                accelerationTickCount++;
+                speed = speed > 0 ? speed - 2 : speed - 1;
+            }
+        }
+
+
         double averageTurnRate = (newData.getHeading() - oldData.getHeading())/dT;
         double averageAcceleration = (newData.getVelocity() - oldData.getSpeed())/dT;
+
+        double averageTurnSpeed = Rules.getTurnRate((oldData.getSpeed() + newData.getVelocity())/2.0);
 
         int startingTick;
         if(averageTurnRate == oldData.getLastKnownTurnRate() && averageAcceleration == 0){
@@ -32,19 +51,10 @@ class ProbabilityMap {
             startingTick = 0;
         }
 
-        double averageTurnSpeed = Rules.getTurnRate((oldData.getSpeed() + newData.getVelocity())/2.0);
         //probability for each tick to turn that gives an expected value of the yielded amount turned
         double turnProbability = Math.pow(Math.abs((averageTurnRate*dT))/(Math.pow(averageTurnSpeed, dT)), 1.0/dT);
-
-        //TODO
-        //tallies number of ticks used to accelerate based on different braking and speeding up rates
-        double accelerationTickCount;
-        if((oldData.getSpeed() < 0 && newData.getVelocity() < 0)){
-            accelerationTickCount = Math.abs(averageAcceleration);
-        }
-        //TODO
-        //Factor in the different rates of acceleration based on direction to the probability of accelerating
-        double accelerateProbability = Math.pow(Math.abs((averageAcceleration*dT))/(Math.pow(averageAcceleration, dT)), 1.0/dT);
+        //probability for each tick to change speed that gives an expected value of the number of ticks where speed changed
+        double accelerateProbability = Math.pow(Math.abs(accelerationTickCount), 1.0/dT);
 
 
         int tSign = averageTurnRate < 0 ? -1 : 1;
@@ -53,6 +63,13 @@ class ProbabilityMap {
             possibleActions.get(1).weigh(i, turnProbability*tSign);
             possibleActions.get(0).weigh(i, accelerateProbability*aSign);
         }
+    }
 
+    public Action getAccelerateAction(){
+        return possibleActions.get(0);
+    }
+
+    public Action getTurnAction(){
+        return possibleActions.get(1);
     }
 }
