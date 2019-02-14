@@ -47,12 +47,6 @@ public class IntellijRobot extends AdvancedRobot {
             g.fillRect((int)e.getX() - 20, (int)e.getY() - 20, 40, 40);
         }
 
-
-        //TODO
-        //Draw lines of probabilities for turn and accelerate
-        //where color represents probability and direction
-        //on the top of the screen for each robot
-
         for(int i = 0; i < enemies.getEnemyList().size(); i++){
             Enemy e = enemies.getEnemyList().get(i);
 
@@ -76,6 +70,7 @@ public class IntellijRobot extends AdvancedRobot {
                 g.fillRect((int)(startingX + tileWidth*col), 20, (int)(tileWidth), 20);
                 g.setColor(Color.BLACK);
                 g.drawRect((int)(startingX + tileWidth*col), 20, (int)(tileWidth), 20);
+                g.drawString(Double.toString(Math.floor(probabilityAtDuration*100.0)/100.0), (int)(startingX + tileWidth*col), 25);
             }
 
             for(int col = 0; col < sizeDeterminingScope; col++){
@@ -87,6 +82,7 @@ public class IntellijRobot extends AdvancedRobot {
                 g.fillRect((int)(startingX + tileWidth*col), 40, (int)(tileWidth), 20);
                 g.setColor(Color.BLACK);
                 g.drawRect((int)(startingX + tileWidth*col), 40, (int)(tileWidth), 20);
+                g.drawString(Double.toString(Math.floor(probabilityAtDuration*100.0)/100.0), (int)(startingX + tileWidth*col), 45);
             }
         }
     }

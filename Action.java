@@ -18,11 +18,8 @@ abstract class Action {
     public double getProbabilityAtDuration(int duration){
         Integer[] keys = durationToProbability.keySet().toArray(new Integer[durationToProbability.size()]);
         for(int i = 0; i < keys.length; i++){
-            if(keys[i] > duration){
-                double dY = durationToProbability.get(keys[i]) - durationToProbability.get(keys[i-1]);
-                double dX = keys[i] - keys[i-1];
-                double estimatedProbability = dY/dX * (duration - keys[i-1]);
-                return estimatedProbability;
+            if(keys[i] == duration){
+                return durationToProbability.get(keys[i]);
             }
         }
         return 0;
@@ -33,7 +30,7 @@ abstract class Action {
         else{dataCounts.replace(d, dataCounts.get(d) + 1);}
 
         if(!durationToProbability.containsKey(d)) durationToProbability.put(d,probability);
-        else{durationToProbability.replace(d, (probability - durationToProbability.get(d))/dataCounts.get(d) + durationToProbability.get(d));}
+        else{durationToProbability.replace(d, (probability - durationToProbability.get(d))/((double)dataCounts.get(d)) + durationToProbability.get(d));}
     }
 
     public int getScopeOfDuration(){
