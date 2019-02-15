@@ -36,23 +36,31 @@ class ProbabilityMap {
         }
 
 
-        double averageTurnRate = (newData.getHeading() - oldData.getHeading())/dT;
+        double averageTurnRate = ((newData.getHeading()+360-oldData.getHeading())%360)/dT;
         double averageAcceleration = (newData.getVelocity() - oldData.getSpeed())/dT;
 
         double averageTurnSpeed = Rules.getTurnRate((oldData.getSpeed() + newData.getVelocity())/2.0);
 
         int startingTick;
-        if(averageTurnRate == oldData.getLastKnownTurnRate() && averageAcceleration == 0){
+        intellijRobot.out.println("last known heading: " + oldData.getHeading());
+        intellijRobot.out.println("new heading: " + newData.getHeading());
+        if(oldData.getHeading() == newData.getHeading() && averageAcceleration == 0){
            startingTick = oldData.getTicksWithoutChange();
            oldData.setLastKnownTurnRate(averageTurnRate);
            oldData.setTicksWithoutChange(startingTick + (int)dT);
         }
         else{
             startingTick = 0;
+            oldData.setTicksWithoutChange(0);
         }
+        intellijRobot.out.println("starting tick: " + startingTick);
 
         //probability for each tick to turn that gives an expected value of the yielded amount turned
-        double turnProbability = Math.pow(Math.abs((averageTurnRate*dT))/(Math.pow(averageTurnSpeed, dT)), 1.0/dT);
+        double turnProbability = averageTurnRate == 0 ? 0 : Math.pow(averageTurnRate/averageTurnSpeed,1/dT);
+        intellijRobot.out.println("robot turned " + ((newData.getHeading()+360-oldData.getHeading())%360) + " degrees");
+        intellijRobot.out.println("average turn speed: " + averageTurnSpeed);
+        intellijRobot.out.println("turn probability is " + turnProbability);
+
         //probability for each tick to change speed that gives an expected value of the number of ticks where speed changed
         double accelerateProbability = Math.pow(Math.abs(accelerationTickCount), 1.0/dT);
 
