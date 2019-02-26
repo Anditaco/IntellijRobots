@@ -19,7 +19,6 @@ class ProbabilityMap {
         if (dT > 8) return;
         intellijRobot.out.println(dT + " ticks happened since " + oldData.getName() + " was last updated");
 
-
         double accelerationTickCount = 0;
         double speed = oldData.getSpeed();
         if(oldData.getSpeed() < newData.getVelocity()){

@@ -5,14 +5,6 @@ import java.util.TreeMap;
 
 abstract class Action {
 
-
-    //TODO
-    //FIX PROBABILITIES SO THEY ARE NOT 0
-
-
-
-
-
     private Map<Integer, Integer> dataCounts = new TreeMap<Integer, Integer>();
     private Map<Integer, Double> durationToProbability = new TreeMap<Integer, Double>();
     public double getProbabilityAtDuration(int duration){
@@ -26,6 +18,8 @@ abstract class Action {
     }
 
     public void weigh(int d, double probability){
+        if(Math.abs(probability) > 1) return;
+
         if(!dataCounts.containsKey(d)) dataCounts.put(d,1);
         else{dataCounts.replace(d, dataCounts.get(d) + 1);}
 

@@ -78,8 +78,8 @@ public class IntellijRobot extends AdvancedRobot {
 
                 //out.println("Probability of change in turn at " + col + " is " + probabilityAtDuration);
 
-                int green = Math.abs(probabilityAtDuration)<1 ? 128 + (int)(127*probabilityAtDuration) : 255;
-                int blue = Math.abs(probabilityAtDuration)<1 ? 128 - (int)(127*probabilityAtDuration) : 255;
+                int green = Math.abs(probabilityAtDuration)<=1 ? 128 + (int)(127*probabilityAtDuration) : 255;
+                int blue = Math.abs(probabilityAtDuration)<=1 ? 128 - (int)(127*probabilityAtDuration) : 255;
                 g.setColor(new Color(0, green ,blue));
                 g.fillRect((int)(startingX + tileWidth*col), 40, (int)(tileWidth), 20);
                 g.setColor(Color.BLACK);
