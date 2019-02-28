@@ -10,7 +10,7 @@ class Enemy {
 
     private String name;
     private double x,y;
-    private double heading;
+    private double heading = -1;
     private double speed;
     private double energy;
     private double distance;
@@ -20,6 +20,7 @@ class Enemy {
     private int ticksWithoutChange = 0;
 
     private long lastUpdateTime = 0;
+    private double lastKnownSpeed = 0;
 
     Enemy(ScannedRobotEvent e, AdvancedRobot player){
         this.player = player;
