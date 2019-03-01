@@ -3,10 +3,13 @@ package IntellijRobots;
 import robocode.AdvancedRobot;
 import robocode.ScannedRobotEvent;
 
+import java.awt.*;
+
 class Enemy {
     private AdvancedRobot player;
 
     private ProbabilityMap probabilities;
+    private Predictor predictor;
 
     private String name;
     private double x,y;
@@ -25,6 +28,7 @@ class Enemy {
     Enemy(ScannedRobotEvent e, AdvancedRobot player){
         this.player = player;
         probabilities = new ProbabilityMap((IntellijRobot)player);
+        predictor = new Predictor(this);
 
         name = e.getName();
         updateData(e);
@@ -70,4 +74,8 @@ class Enemy {
         probabilities.updateProbabilities(e, this);
     }
     public ProbabilityMap getProbabilities(){return probabilities;}
+
+    public Point mostLikelyLocation(int time){
+        return predictor.mostLikelyPosition(time);
+    }
 }

@@ -4,14 +4,15 @@ package IntellijRobots;
 import robocode.Rules;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 //should generate the locations an enemy could be based on its movement probabilities
 public class Predictor {
     Enemy enemy;
+    IntellijRobot player;
 
-    public Predictor(Enemy e){
+    public Predictor(Enemy e, IntellijRobot p){
         enemy = e;
+        player = p;
     }
 
 
@@ -27,17 +28,21 @@ public class Predictor {
 
             double dSpeed = speedFactor*speedProbability;
             double dHeading = Rules.getTurnRate(speed)*enemy.getProbabilities().getTurnAction().getProbabilityAtDuration(i);
+            double theta1 = (5*Math.PI/2 - heading*Math.PI/180)%(2*Math.PI);
             double dTheta = dHeading*Math.PI/180.0;
 
-            //TODO Update the prime calculator to account for initial heading
+            double xPrime = location.getX() + 2*speed/dTheta*Math.sin(dTheta/2)*Math.cos(Math.PI/2-dTheta/2-theta1);
+            double yPrime = location.getY() + 2*speed/dTheta*Math.sin(dTheta/2)*Math.sin(Math.PI/2-dTheta/2-theta1);
 
-            //x' = x + cos(dTheta)*2*dTheta/speed*tan(dTheta/2)
-            //y' = y + sin(dTheta)*2*dTheta/speed*tan(dTheta/2)
-            double xPrime = location.getX() + 2*Math.cos(dTheta)*dTheta*Math.tan(dTheta/2)/speed;
-            double yPrime = location.getY() + 2*Math.sin(dTheta)*dTheta*Math.tan(dTheta/2)/speed;
+            location.setLocation(xPrime,yPrime);
+
+            player.out.println("Starting info: x = " + location.getX() + ", y = " + location.getY() + ", heading = " + heading + ", speed = " + speed);
 
             heading += dHeading;
             speed += dSpeed;
+
+            player.out.println("Calculated info: x = " + xPrime + ", y = " + yPrime + " heading " + heading + ", speed = " + speed);
         }
+        return location;
     }
 }

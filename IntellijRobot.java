@@ -39,14 +39,25 @@ public class IntellijRobot extends AdvancedRobot {
     @Override
     public void onPaint(Graphics2D g) {
         super.onPaint(g);
+
+        drawBasicInfo(g);
+        drawEnemyLocations(g);
+        drawProbabilityBars(g);
+        drawProjections(g);
+    }
+
+    private void drawBasicInfo(Graphics g){
         g.setColor(Color.GREEN);
         g.drawString(Integer.toString(enemies.getEnemyList().size()), 50, 50);
+    }
+    private void drawEnemyLocations(Graphics g){
         for(Enemy e : enemies.getEnemyList()) {
             g.setColor(new Color(0,0,255,128));
             g.drawLine((int)e.getX(), (int)e.getY(), (int) getX(), (int) getY());
             g.fillRect((int)e.getX() - 20, (int)e.getY() - 20, 40, 40);
         }
-
+    }
+    private void drawProbabilityBars(Graphics g){
         for(int i = 0; i < enemies.getEnemyList().size(); i++){
             Enemy e = enemies.getEnemyList().get(i);
 
@@ -67,10 +78,10 @@ public class IntellijRobot extends AdvancedRobot {
                 //out.println("Probability of change in speed at " + col + " is " + probabilityAtDuration);
 
                 g.setColor(new Color(128 + (int)(100*probabilityAtDuration), 0 ,128 - (int)(100*probabilityAtDuration)));
-                g.fillRect((int)(startingX + tileWidth*col), 20, (int)(tileWidth), 20);
+                g.fillRect((int)(startingX + tileWidth*col), 20*(2*i+1), (int)(tileWidth), 20);
                 g.setColor(Color.BLACK);
-                g.drawRect((int)(startingX + tileWidth*col), 20, (int)(tileWidth), 20);
-                g.drawString(Double.toString(Math.floor(probabilityAtDuration*100.0)/100.0), (int)(startingX + tileWidth*col), 25);
+                g.drawRect((int)(startingX + tileWidth*col), 20*(2*i+1), (int)(tileWidth), 20);
+                g.drawString(Double.toString(Math.floor(probabilityAtDuration*100.0)/100.0), (int)(startingX + tileWidth*col), 20*(2*i+1)+5);
             }
 
             for(int col = 0; col < sizeDeterminingScope; col++){
@@ -81,11 +92,18 @@ public class IntellijRobot extends AdvancedRobot {
                 int green = Math.abs(probabilityAtDuration)<=1 ? 128 + (int)(127*probabilityAtDuration) : 255;
                 int blue = Math.abs(probabilityAtDuration)<=1 ? 128 - (int)(127*probabilityAtDuration) : 255;
                 g.setColor(new Color(0, green ,blue));
-                g.fillRect((int)(startingX + tileWidth*col), 40, (int)(tileWidth), 20);
+                g.fillRect((int)(startingX + tileWidth*col), 20*(2*i), (int)(tileWidth), 20);
                 g.setColor(Color.BLACK);
-                g.drawRect((int)(startingX + tileWidth*col), 40, (int)(tileWidth), 20);
-                g.drawString(Double.toString(Math.floor(probabilityAtDuration*100.0)/100.0), (int)(startingX + tileWidth*col), 45);
+                g.drawRect((int)(startingX + tileWidth*col), 20*(2*i), (int)(tileWidth), 20);
+                g.drawString(Double.toString(Math.floor(probabilityAtDuration*100.0)/100.0), (int)(startingX + tileWidth*col), 20*(2*i)+5);
             }
+        }
+    }
+    private void drawProjections(Graphics g){
+        g.setColor(new Color(158, 188, 79, 144));
+        for(Enemy e : enemies.getEnemyList()){
+            Point center = e.mostLikelyLocation(8);
+            g.fillRect((int)center.getX()-10, (int)center.getY()-10, 20, 20);
         }
     }
 }
