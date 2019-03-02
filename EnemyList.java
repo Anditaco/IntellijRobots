@@ -7,8 +7,8 @@ import robocode.ScannedRobotEvent;
 import java.util.ArrayList;
 
 class EnemyList {
-    private AdvancedRobot player;
-    EnemyList(AdvancedRobot player){
+    private IntellijRobot player;
+    EnemyList(IntellijRobot player){
         this.player = player;
     }
 

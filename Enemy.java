@@ -6,7 +6,7 @@ import robocode.ScannedRobotEvent;
 import java.awt.*;
 
 class Enemy {
-    private AdvancedRobot player;
+    private IntellijRobot player;
 
     private ProbabilityMap probabilities;
     private Predictor predictor;
@@ -25,10 +25,10 @@ class Enemy {
     private long lastUpdateTime = 0;
     private double lastKnownSpeed = 0;
 
-    Enemy(ScannedRobotEvent e, AdvancedRobot player){
+    Enemy(ScannedRobotEvent e, IntellijRobot player){
         this.player = player;
         probabilities = new ProbabilityMap((IntellijRobot)player);
-        predictor = new Predictor(this);
+        predictor = new Predictor(this, player);
 
         name = e.getName();
         updateData(e);
@@ -75,7 +75,7 @@ class Enemy {
     }
     public ProbabilityMap getProbabilities(){return probabilities;}
 
-    public Point mostLikelyLocation(int time){
+    public DoublePoint mostLikelyLocation(int time){
         return predictor.mostLikelyPosition(time);
     }
 }

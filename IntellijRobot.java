@@ -10,7 +10,6 @@ public class IntellijRobot extends AdvancedRobot {
 
     private EnemyList enemies = new EnemyList(this);
 
-
     public void run() {
 
         Color radar = new Color(255, 205, 56);
@@ -41,7 +40,7 @@ public class IntellijRobot extends AdvancedRobot {
         super.onPaint(g);
 
         drawBasicInfo(g);
-        drawEnemyLocations(g);
+      //  drawEnemyLocations(g);
         drawProbabilityBars(g);
         drawProjections(g);
     }
@@ -102,7 +101,7 @@ public class IntellijRobot extends AdvancedRobot {
     private void drawProjections(Graphics g){
         g.setColor(new Color(158, 188, 79, 144));
         for(Enemy e : enemies.getEnemyList()){
-            Point center = e.mostLikelyLocation(8);
+            DoublePoint center = e.mostLikelyLocation(8);
             g.fillRect((int)center.getX()-10, (int)center.getY()-10, 20, 20);
         }
     }
